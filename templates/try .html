@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>House Price Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <!-- Google Web Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
+
+<!-- Icon Font Stylesheet -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Libraries Stylesheet -->
+<link href="static/lib/animate/animate.min.css" rel="stylesheet">
+<link href="static/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+<!-- Customized Bootstrap Stylesheet -->
+<link href="static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Template Stylesheet -->
+<link href="static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-xxl bg-white p-0">
+
+        <!-- Header Start -->
+        <div class="container-fluid header bg-primary text-white p-4">
+            <h1 class="text-center">House Price Prediction</h1>
+        </div>
+        <!-- Header End -->
+
+        <!-- Form Start -->
+        <div class="container mt-5">
+            <form id="predictionForm" class="prediction-form">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="location">Location:</label>
+                        <select id="location" name="location" class="form-control" required>
+                            <option value="">Select Location</option>
+                            <option value="klcc">KLCC</option>
+                            <option value="selangor">Selangor</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="size_num">Size (sq ft):</label>
+                        <input type="number" id="size_num" name="size_num" class="form-control" placeholder="Enter Size" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="car_parks">Number of Car Parks:</label>
+                        <input type="number" id="car_parks" name="car_parks" class="form-control" placeholder="Enter Number of Car Parks" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="furnishing">Furnishing:</label>
+                        <select id="furnishing" name="furnishing" class="form-control" required>
+                            <option value="">Select Furnishing</option>
+                            <option value="Fully Furnished">Fully Furnished</option>
+                            <option value="Partially Furnished">Partially Furnished</option>
+                            <option value="Unfurnished">Unfurnished</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary w-100 py-3">Predict Price</button>
+                </div>
+            </form>
+        </div>
+        <!-- Form End -->
+
+        <!-- Result Start -->
+        <div class="container mt-5">
+            <div id="result" class="result-container">
+                
+            </div>
+        </div>
+        <!-- Result End -->
+
+        <!-- Footer Start -->
+        <div class="container-fluid bg-dark text-white text-center py-3 mt-5">
+            <p class="mb-0">&copy; 2025 House Price Prediction. All Rights Reserved.</p>
+        </div>
+        <!-- Footer End -->
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const data = {
+                property_type: document.getElementById('property_type').value,
+                location: document.getElementById('location').value,
+                size_num: parseInt(document.getElementById('size_num').value),
+                car_parks: parseInt(document.getElementById('car_parks').value),
+                furnishing: document.getElementById('furnishing').value,
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const resultDiv = document.getElementById('result');
+                if (response.ok) {
+                    const result = await response.json();
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `<h3 class="text-center">Predicted Price: RM${result.predicted_price.toLocaleString()}</h3>`;
+                } else {
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = '<h3 class="text-danger text-center">Failed to get prediction. Try again later.</h3>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<h3 class="text-danger text-center">An error occurred. Please try again later.</h3>';
+            }
+        });
+    </script>
+</body>
+</html>
